@@ -1,0 +1,13 @@
+db_connections:
+
+    main:
+        host: database
+        port: 5432
+        database: darwin
+        user: darwin
+        password: darwin
+
+app:
+    foo: 123
+
+

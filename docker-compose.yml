@@ -1,0 +1,64 @@
+version: '2'
+
+services:
+
+    database:
+        image: darwin-database:1.0
+        container_name: darwin-database
+        build: database/build
+        ports:
+            - '8002:5432'
+        environment:
+            POSTGRES_PASSWORD: 1234567890
+        volumes:
+            - ./database/data:/var/lib/postgresql/data
+
+    data:
+        image: darwin-data:1.0
+        container_name: darwin-data
+        build: data
+        volumes:
+            - ./config:/etc/darwin:ro
+            - ./data/migrations:/darwin/migrations:ro
+            - ./data/scripts:/darwin/scripts:ro
+        links:
+            - database
+
+    app:
+        image: darwin-app:1.0
+        container_name: darwin-app
+        build: app
+        command: node_modules/.bin/nodemon index.js
+        ports:
+            - '8001:8001'
+        environment:
+            NODE_ENV: development
+        volumes:
+            - ./config:/etc/darwin:ro
+            - ./app:/home/app/codebase
+            - /home/app/codebase/node_modules
+        links:
+            - database
+
+    web:
+        image: darwin-web:1.0
+        container_name: darwin-web
+        build: web
+        command: tail -F -n0 /etc/hosts
+        volumes:
+           - ./web:/web
+
+    facade:
+        image: darwin-facade:1.0
+        container_name: darwin-facade
+        build: facade
+        ports:
+            - '8085:80'
+        depends_on:
+            - web
+        volumes_from:
+            - web:ro
+        links:
+            - app
+        volumes:
+            - ./facade/nginx:/etc/nginx:ro
