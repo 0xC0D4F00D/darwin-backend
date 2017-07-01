@@ -1,5 +1,7 @@
 const _ = require('lodash');
 const async = require('async');
+const https = require('https');
+var querystring = require('querystring');
 
 function AlarmService(config) {
     let me = this;
@@ -13,13 +15,88 @@ AlarmService.prototype.trigger = function (params, cb) {
     let me = this;
     console.log('triggerAlarm', params);
     me._dataManager.alarm.trigger(params, function (err, data) {
-        if (err) return cb(err);
-        var users = _.get(data, 'rows');
+        if (err) {
+            console.log('err', err);
+            return cb(err);
+        }
+        var users = data;
+        console.log('FIGHTERS', users);
         async.eachSeries(users, function (user, cb) {
             let id = _.get(user, 'id');
             let token = _.get(user, 'token');
-            console.log('PUSH NOTIFICATION TO USER WITH ID', id, 'AND TOKEN', token);
-            return cb();
+
+
+            if (_.isEmpty(token)) return cb();
+            console.log('PUSH TO ', token);
+
+
+            var key = _.get(me._config, 'app.fcm_api_key');
+
+            // var postData = querystring.stringify({
+            //     data: {},
+            //     to : token
+            // });
+
+            var postData = JSON.stringify({ data: {},  to : token });
+
+            console.log('POST DATA', postData);
+
+            var options = {
+                hostname: 'fcm.googleapis.com',
+                port: '443',
+                path: '/fcm/send',
+                method: 'POST',
+                keepAlive: true,
+                headers: {
+                    'Authorization': 'key=' + key,
+                    'Content-Type': 'application/json',
+                    'Cache-Control': 'no-cache'
+                }
+            };
+
+            console.log('OPTIONS', options);
+
+            var request = https.request(options, function(response) {
+                var chunks = [];
+
+                response.on('data', function (chunk) {
+                    chunks.push(chunk);
+                });
+
+                response.on('end', function () {
+                    var msg;
+                    console.log('STATUS', response.statusCode);
+
+                    var body = Buffer.concat(chunks);
+                    console.log(body.toString());
+
+
+                    if (response.statusCode != 200) {
+                        msg = 'Unexpected result from FCM. Status: ' + response.statusCode;
+                        return cb(new Error(msg));
+                    } else {
+                        var body = Buffer.concat(chunks);
+                        console.log(body.toString());
+                        //return cb(null, body);
+                        return cb();
+                    }
+                });
+            });
+
+            request.on('error', function(err) {
+                var msg = 'Error during requesting Print Server.';
+                // return cb(new Error(msg, err))
+                return cb();
+            });
+
+            request.write(postData);
+
+            request.end();
+
+
+
+            //console.log('PUSH NOTIFICATION TO USER WITH ID', id, 'AND TOKEN', token);
+            // return cb();
         }, cb);
     });
 };

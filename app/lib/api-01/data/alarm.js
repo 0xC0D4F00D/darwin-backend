@@ -24,7 +24,8 @@ DataManager.prototype.trigger = function (params, cb) {
 
         client.query(sql, queryParams, function (err, data) {
             release();
-            return cb(err, data);
+            let result = _.get(data, 'rows');
+            return cb(err, result);
         });
     });
 };

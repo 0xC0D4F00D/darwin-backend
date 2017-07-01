@@ -8,6 +8,7 @@ db_connections:
         password: darwin
 
 app:
-    foo: 123
+    fcm_api_key: "AAAAndJ7bMY:APA91bFsdGo1pn4c_dh7RBkAQ_ROojyQkmrVytK3HzapUVtHCX4suBzG8kaNVO1RcKs0iGOhden_mpvpe7Nu9HpOLDuMxY9riSRzYa3JRiXtGXfTdoKRaRK7L7tNrvSCoBviwaAXNa75"
+
 
 

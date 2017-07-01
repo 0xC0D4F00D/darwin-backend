@@ -39,8 +39,7 @@ BEGIN
     -- Найти пользователей, которых нужно уведомить
     FOR var__user_record IN
         SELECT
-          a.id,
-          a.token
+          *
         FROM main.users a
         LEFT OUTER JOIN main.users b ON ST_Intersects(
           a.geom,
