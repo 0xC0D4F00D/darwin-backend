@@ -43,7 +43,7 @@ DataManager.prototype.list = function (params, cb) {
                  ST_Transform(
                    ST_Buffer(
                      ST_Transform(b.geom, 3857),
-                     50000000000
+                     5000
                    ),
                    4326
                  )

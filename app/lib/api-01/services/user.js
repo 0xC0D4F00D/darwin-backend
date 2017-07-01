@@ -21,6 +21,10 @@ UserService.prototype.updateLocation = function (params, cb) {
     me._dataManager.user.updateLocation(params, cb);
 };
 
+UserService.prototype.getView = function (params, cb) {
+    var me = this;
+    me._dataManager.user.getView(params, cb);
+};
 
 // UserService.prototype.logUserIn = function (params, cb) {
 //     var me = this;

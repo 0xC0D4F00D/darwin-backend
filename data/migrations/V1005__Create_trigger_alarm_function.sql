@@ -41,7 +41,7 @@ BEGIN
         SELECT
           *
         FROM main.users a
-        LEFT OUTER JOIN main.users b ON ST_Intersects(
+        JOIN main.users b ON ST_Intersects(
           a.geom,
           ST_Transform(
             ST_Buffer(

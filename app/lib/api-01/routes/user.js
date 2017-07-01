@@ -56,20 +56,25 @@ const register = function (server, options, next) {
     });
 
 
-    // server.route({
-    //     method: 'GET',
-    //     path: '/test',
-    //     config: {
-    //         // auth: {
-    //         //     scope: [ 'admin' ]
-    //         // },
-    //         auth: false,
-    //         handler: function (request, reply) {
-    //             return reply(Boom.badImplementation('Ahhh'));
-    //             // return reply('HELLO, MAN!');
-    //         }
-    //     }
-    // });
+    server.route({
+        method: 'GET',
+        path: '/view',
+        config: {
+            // auth: {
+            //     scope: [ 'admin' ]
+            // },
+            auth: false,
+            handler: function (request, reply) {
+                var params = {};
+                    userService.getView(params, function (err, result) {
+                    if (err) {
+                        return reply({ success: false });
+                    }
+                    return reply({ success: true, result: result });
+                });
+            }
+        }
+    });
 
     // server.route({
     //     method: 'GET',

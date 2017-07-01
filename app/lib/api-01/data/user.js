@@ -46,3 +46,50 @@ DataManager.prototype.updateLocation = function (params, cb) {
         });
     });
 };
+
+DataManager.prototype.getView = function (params, cb) {
+    var me = this;
+    me._databaseService.getClient(function(err, client, release) {
+        var sql = `SELECT row_to_json(fc) AS result FROM
+(
+    SELECT
+        'FeatureCollection' AS type,
+        array_to_json(array_agg(f)) AS features
+    FROM
+    (
+       --
+       SELECT
+           'Feature' AS type,
+           ST_AsGeoJSON(ST_Transform(o.geom, 3857))::json AS geometry,
+           json_build_object('type', 'user', 'id', o.id) AS properties
+       FROM main.users AS o
+       WHERE EXTRACT(EPOCH FROM (now() - o.updated_at)) < 180
+       --
+       UNION ALL
+       --
+       SELECT
+           'Feature' AS type,
+           ST_AsGeoJSON(ST_Buffer(ST_Transform(z.geom, 3857), 5000, 10))::json AS geometry,
+           json_build_object('type', 'zone') AS properties
+       FROM main.users AS z
+       WHERE EXTRACT(EPOCH FROM (now() - z.updated_at)) < 180
+       --
+       UNION ALL
+       --
+       SELECT
+           'Feature' AS type,
+           ST_AsGeoJSON(ST_Transform(m.geom, 3857))::json AS geometry,
+           json_build_object('type', 'alarm', 'status', m.status) AS properties
+       FROM main.alarms AS m
+       WHERE m.updated_at IS NULL OR EXTRACT(EPOCH FROM (now() - m.updated_at)) < 180
+       --
+    ) AS f
+) AS fc;`;
+        client.query(sql, function (err, data) {
+            release();
+            if (err) return cb(err);
+            let result = _.get(data, ['rows', 0, 'result']);
+            return cb(null, result);
+        });
+    });
+};
