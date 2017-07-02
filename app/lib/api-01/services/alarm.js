@@ -121,6 +121,10 @@ AlarmService.prototype.list = function (params, cb) {
                 if (lon > maxLon) maxLon = lon;
                 if (lat > maxLat) maxLat = lat;
             }
+            minLon -= 0.002;
+            minLat -= 0.002;
+            maxLon += 0.002;
+            maxLat += 0.002;
             result.bbox = [minLon, minLat, maxLon, maxLat];
             result.alarms = data;
         }
