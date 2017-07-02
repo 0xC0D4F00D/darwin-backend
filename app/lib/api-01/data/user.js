@@ -63,7 +63,7 @@ DataManager.prototype.getView = function (params, cb) {
            ST_AsGeoJSON(ST_Transform(o.geom, 3857))::json AS geometry,
            json_build_object('type', 'user', 'id', o.id) AS properties
        FROM main.users AS o
-       WHERE EXTRACT(EPOCH FROM (now() - o.updated_at)) < 180
+       WHERE EXTRACT(EPOCH FROM (now() - o.updated_at)) < 600
        --
        UNION ALL
        --
@@ -72,7 +72,7 @@ DataManager.prototype.getView = function (params, cb) {
            ST_AsGeoJSON(ST_Buffer(ST_Transform(z.geom, 3857), 5000, 10))::json AS geometry,
            json_build_object('type', 'zone') AS properties
        FROM main.users AS z
-       WHERE EXTRACT(EPOCH FROM (now() - z.updated_at)) < 180
+       WHERE EXTRACT(EPOCH FROM (now() - z.updated_at)) < 600
        --
        UNION ALL
        --
@@ -81,7 +81,7 @@ DataManager.prototype.getView = function (params, cb) {
            ST_AsGeoJSON(ST_Transform(m.geom, 3857))::json AS geometry,
            json_build_object('type', 'alarm', 'status', m.status) AS properties
        FROM main.alarms AS m
-       WHERE m.updated_at IS NULL OR EXTRACT(EPOCH FROM (now() - m.updated_at)) < 180
+       WHERE m.updated_at IS NULL OR EXTRACT(EPOCH FROM (now() - m.updated_at)) < 600
        --
     ) AS f
 ) AS fc;`;
