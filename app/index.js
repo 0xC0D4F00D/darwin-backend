@@ -82,6 +82,24 @@ pipeline.push(function (cb) {
 
 // ----
 
+let TrackService = rootRequire('/lib/api-01/services/track');
+let trackService = new TrackService({
+    config: config,
+    dataManager: dataManager
+});
+
+let trackRoute = rootRequire('/lib/api-01/routes/track');
+
+pipeline.push(function (cb) {
+    server.register({
+        register: trackRoute,
+        options: { trackService: trackService },
+        routes: { prefix: '/api/v1/track' }
+    }, cb);
+});
+
+// ----
+
 pipeline.push(function (cb) {
     server.start(cb);
 });
