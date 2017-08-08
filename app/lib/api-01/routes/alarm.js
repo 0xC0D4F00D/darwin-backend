@@ -1,8 +1,8 @@
 'use strict';
 
 const _ = require('lodash');
-var Joi = require('joi');
-var Boom = require('boom');
+const Joi = require('joi');
+const Boom = require('boom');
 
 const register = function (server, options, next) {
 
